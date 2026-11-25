@@ -2,6 +2,10 @@
 (() => {
   'use strict';
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  // the few strings the script writes itself (the pages are translated at build time by tools/i18n_en.py)
+  const EN = document.documentElement.lang === 'en';
+  const T = EN ? { musicOn: 'Background music: on', musicOff: 'Background music: off' }
+               : { musicOn: 'Музика во позадина: вклучена', musicOff: 'Музика во позадина: исклучена' };
 
   // ---------------------------------------------------------------- lightbox for every a.zoom on the page
   const lb = $('dialog.lightbox');
@@ -113,7 +117,7 @@
   const setUi = () => {
     if (!toggle) return;
     toggle.setAttribute('aria-pressed', String(wanted));
-    toggle.title = wanted ? 'Музика во позадина: вклучена' : 'Музика во позадина: исклучена';
+    toggle.title = wanted ? T.musicOn : T.musicOff;
     toggle.classList.toggle('off', !wanted);
     // pulse while the music is wanted but the browser hasn't let it start yet (it needs a click/tap first)
     toggle.classList.toggle('hint', wanted && !!bgm && bgm.paused && !busy());

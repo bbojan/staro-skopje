@@ -36,6 +36,10 @@ h1 { font-size: clamp(2rem, 5vw, 3.4rem); margin: 0 0 .3em; }
 .nav a { color: var(--ink-2); text-decoration: none; padding: 8px 12px; border-radius: 999px; white-space: nowrap; font-size: 15px; }
 .nav a:hover { background: var(--paper-2); color: var(--ink); }
 .nav a[aria-current="page"] { background: var(--ink); color: var(--paper); }
+.lang-switch { flex: none; font: 700 13px var(--sans); letter-spacing: .06em; color: var(--ink-2); text-decoration: none;
+  border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; }
+.lang-switch:hover { color: var(--accent); border-color: var(--accent); }
+@media (max-width: 760px) { .lang-switch { position: absolute; top: 9px; right: 64px; padding: 5px 9px; } }
 .sound-toggle { display: inline-flex; align-items: center; gap: 6px; flex: none; border: 1px solid var(--line); background: var(--card);
   color: var(--ink); border-radius: 999px; padding: 6px 12px; font: 600 14px var(--sans); cursor: pointer; }
 .sound-toggle .st-icon { font-size: 16px; }
