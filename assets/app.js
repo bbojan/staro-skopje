@@ -125,9 +125,17 @@
   };
   if (bgm) {
     setUi();
-    const firstGesture = () => { startBgm(); removeEventListener('pointerdown', firstGesture, true); removeEventListener('keydown', firstGesture, true); };
-    addEventListener('pointerdown', firstGesture, true);
-    addEventListener('keydown', firstGesture, true);
+    // Try on every kind of gesture until the browser allows sound. Browsers only grant it for clicks, key presses and
+    // touches (the end of a touch, including a swipe/scroll on phones counts in most browsers); a mouse-wheel or
+    // trackpad scroll never does, so on desktop the first click or key press starts it.
+    const GESTURES = ['pointerdown', 'pointerup', 'touchstart', 'touchend', 'click', 'keydown', 'wheel', 'scroll'];
+    const firstGesture = () => {
+      startBgm();
+      setTimeout(() => {
+        if (!bgm.paused || !wanted) GESTURES.forEach(g => removeEventListener(g, firstGesture, true));
+      }, 250);
+    };
+    GESTURES.forEach(g => addEventListener(g, firstGesture, { capture: true, passive: true }));
     // try right away too: works when the browser already allows sound for this site (e.g. after earlier clicks)
     if (sessionStorage.getItem('bgmT')) startBgm();
     const save = () => { if (!bgm.paused || bgm.currentTime) sessionStorage.setItem('bgmT', String(bgm.currentTime)); };
