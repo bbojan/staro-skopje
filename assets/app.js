@@ -103,6 +103,51 @@
     $$('.tsec').forEach(s => io.observe(s));
   }
 
-  // only one audio/video playing at a time
-  document.addEventListener('play', e => $$('audio, video').forEach(m => { if (m !== e.target) m.pause(); }), true);
+  // ---------------------------------------------------------------- background music (the CD's looping instrumental)
+  // On by default like the CD; the choice is remembered. Browsers only allow sound after a user gesture, so it
+  // starts on the first click/tap/key. It pauses while any narration or film plays and resumes after.
+  const bgm = $('#bgm'), toggle = $('.sound-toggle');
+  const others = () => $$('audio, video').filter(m => m !== bgm);
+  const busy = () => others().some(m => !m.paused && !m.ended);
+  let wanted = localStorage.getItem('bgm') !== 'off';
+  const setUi = () => {
+    if (!toggle) return;
+    toggle.setAttribute('aria-pressed', String(wanted));
+    toggle.title = wanted ? 'Музика во позадина: вклучена' : 'Музика во позадина: исклучена';
+    toggle.classList.toggle('off', !wanted);
+  };
+  const startBgm = () => {
+    if (!bgm || !wanted || busy() || !bgm.paused) return;
+    const t = +sessionStorage.getItem('bgmT') || 0;
+    if (t && !bgm.currentTime) { try { bgm.currentTime = t; } catch (e) { } }
+    bgm.volume = 0.45;
+    bgm.play().catch(() => { });
+  };
+  if (bgm) {
+    setUi();
+    const firstGesture = () => { startBgm(); removeEventListener('pointerdown', firstGesture, true); removeEventListener('keydown', firstGesture, true); };
+    addEventListener('pointerdown', firstGesture, true);
+    addEventListener('keydown', firstGesture, true);
+    // try right away too: works when the browser already allows sound for this site (e.g. after earlier clicks)
+    if (sessionStorage.getItem('bgmT')) startBgm();
+    const save = () => { if (!bgm.paused || bgm.currentTime) sessionStorage.setItem('bgmT', String(bgm.currentTime)); };
+    addEventListener('pagehide', save);
+    setInterval(save, 2000);
+    toggle && toggle.addEventListener('click', e => {
+      e.stopPropagation();
+      wanted = !wanted; localStorage.setItem('bgm', wanted ? 'on' : 'off'); setUi();
+      if (wanted) startBgm(); else bgm.pause();
+    });
+  }
+
+  // only one narration/film at a time; the background music steps aside while one plays
+  document.addEventListener('play', e => {
+    if (e.target === bgm) { if (busy()) bgm.pause(); return; }
+    others().forEach(m => { if (m !== e.target) m.pause(); });
+    if (bgm) bgm.pause();
+  }, true);
+  const resume = () => setTimeout(() => { if (!busy()) startBgm(); }, 300);
+  document.addEventListener('pause', e => { if (e.target !== bgm) resume(); }, true);
+  document.addEventListener('ended', e => { if (e.target !== bgm) resume(); }, true);
+  document.addEventListener('close', e => { if (e.target.matches && e.target.matches('dialog.player')) resume(); }, true);
 })();
