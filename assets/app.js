@@ -3,9 +3,19 @@
   'use strict';
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   // the few strings the script writes itself (the pages are translated at build time by tools/i18n_en.py)
-  const EN = document.documentElement.lang === 'en';
-  const T = EN ? { musicOn: 'Background music: on', musicOff: 'Background music: off' }
-               : { musicOn: 'Музика во позадина: вклучена', musicOff: 'Музика во позадина: исклучена' };
+  const STR = {
+    mk: ['Музика во позадина: вклучена', 'Музика во позадина: исклучена'],
+    en: ['Background music: on', 'Background music: off'],
+    sq: ['Muzika në sfond: e ndezur', 'Muzika në sfond: e fikur'],
+    tr: ['Arka plan müziği: açık', 'Arka plan müziği: kapalı'],
+    de: ['Hintergrundmusik: an', 'Hintergrundmusik: aus'],
+    el: ['Μουσική υπόκρουση: ενεργή', 'Μουσική υπόκρουση: ανενεργή'],
+    sr: ['Музика у позадини: укључена', 'Музика у позадини: искључена'],
+    hr: ['Glazba u pozadini: uključena', 'Glazba u pozadini: isključena'],
+  }[document.documentElement.lang] || ['Музика во позадина: вклучена', 'Музика во позадина: исклучена'];
+  const T = { musicOn: STR[0], musicOff: STR[1] };
+  // close the language menu when clicking elsewhere
+  document.addEventListener('click', e => { const m = $('details.langs[open]'); if (m && !m.contains(e.target)) m.open = false; });
 
   // ---------------------------------------------------------------- lightbox for every a.zoom on the page
   const lb = $('dialog.lightbox');
