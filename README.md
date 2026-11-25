@@ -3,7 +3,7 @@
 Web edition of the 2001 multimedia CD-ROM *Старо Скопје*: the city through old postcards, films, a narrated
 chronology and an old orientation map. The site is in Macedonian, using the CD's own content and wording.
 
-**Site:** open `index.html`, or the GitHub Pages address once Pages is enabled.
+**🌐 Live site: [bbojan.github.io/staro-skopje](https://bbojan.github.io/staro-skopje/)**
 
 ## Sections
 
