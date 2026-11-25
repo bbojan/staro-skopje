@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Старо Скопје</title>
+  <!-- Old Skopje: the Kale fortress wall above the Stone Bridge over the Vardar -->
+  <rect width="64" height="64" rx="13" fill="#a23b2a"/>
+  <g fill="#f5efe4">
+    <!-- Kale: wall with merlons and a tower -->
+    <path d="M14 27V19h3v3h3v-3h3v3h3v-3h3v3h3V11h2.5v2.5h2v-2.5h2v2.5h2v-2.5h2.5V22h1v-3h3v3h2v5z"/>
+    <!-- Stone Bridge: deck with three arches -->
+    <path fill-rule="evenodd" d="M5 35q27-5 54 0v17H5z M11 52a6 6 0 0 1 12 0z M26 52a6 6 0 0 1 12 0z M41 52a6 6 0 0 1 12 0z"/>
+  </g>
+  <!-- Vardar -->
+  <path d="M9 57h46" stroke="#f5efe4" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+</svg>
