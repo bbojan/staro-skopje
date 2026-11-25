@@ -115,7 +115,10 @@
     toggle.setAttribute('aria-pressed', String(wanted));
     toggle.title = wanted ? 'Музика во позадина: вклучена' : 'Музика во позадина: исклучена';
     toggle.classList.toggle('off', !wanted);
+    // pulse while the music is wanted but the browser hasn't let it start yet (it needs a click/tap first)
+    toggle.classList.toggle('hint', wanted && !!bgm && bgm.paused && !busy());
   };
+  if (bgm) ['play', 'pause', 'playing'].forEach(ev => bgm.addEventListener(ev, setUi));
   const startBgm = () => {
     if (!bgm || !wanted || busy() || !bgm.paused) return;
     const t = +sessionStorage.getItem('bgmT') || 0;

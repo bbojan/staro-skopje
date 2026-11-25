@@ -42,6 +42,15 @@ h1 { font-size: clamp(2rem, 5vw, 3.4rem); margin: 0 0 .3em; }
 .sound-toggle:hover { border-color: var(--accent); }
 .sound-toggle[aria-pressed="true"] .st-icon { color: var(--accent); }
 .sound-toggle.off { color: var(--ink-2); }
+/* hint: music is on but waiting for the first click/tap; gentle pulsing ring */
+.sound-toggle.hint { border-color: var(--accent); animation: st-pulse 1.8s ease-out infinite; }
+.sound-toggle.hint .st-icon { animation: st-note 1.8s ease-in-out infinite; }
+@keyframes st-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+  70% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent); }
+}
+@keyframes st-note { 50% { transform: scale(1.25); } }
 .sound-toggle.off .st-icon { text-decoration: line-through; }
 @media (max-width: 760px) {
   .sound-toggle { position: absolute; top: 9px; right: 12px; padding: 5px 10px; }
