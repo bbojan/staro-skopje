@@ -3,7 +3,7 @@
 Web edition of the 2001 multimedia CD-ROM *Старо Скопје*: the city through old postcards, films, a narrated
 chronology and an old orientation map. The site is in Macedonian, using the CD's own content and wording.
 
-**🌐 Live site: [bbojan.github.io/staro-skopje](https://bbojan.github.io/staro-skopje/)** · **English: [bbojan.github.io/staro-skopje/en/](https://bbojan.github.io/staro-skopje/en/)** · **Shqip: [bbojan.github.io/staro-skopje/sq/](https://bbojan.github.io/staro-skopje/sq/)** · **Türkçe: [bbojan.github.io/staro-skopje/tr/](https://bbojan.github.io/staro-skopje/tr/)** · **Српски: [bbojan.github.io/staro-skopje/sr/](https://bbojan.github.io/staro-skopje/sr/)** · **Hrvatski: [bbojan.github.io/staro-skopje/hr/](https://bbojan.github.io/staro-skopje/hr/)**
+**🌐 Live site: [bbojan.github.io/staro-skopje](https://bbojan.github.io/staro-skopje/)** · **English: [bbojan.github.io/staro-skopje/en/](https://bbojan.github.io/staro-skopje/en/)** · **Shqip: [bbojan.github.io/staro-skopje/sq/](https://bbojan.github.io/staro-skopje/sq/)** · **Türkçe: [bbojan.github.io/staro-skopje/tr/](https://bbojan.github.io/staro-skopje/tr/)** · **Српски: [bbojan.github.io/staro-skopje/sr/](https://bbojan.github.io/staro-skopje/sr/)** · **Hrvatski: [bbojan.github.io/staro-skopje/hr/](https://bbojan.github.io/staro-skopje/hr/)** · **Deutsch: [bbojan.github.io/staro-skopje/de/](https://bbojan.github.io/staro-skopje/de/)**
 
 ## Sections
 
