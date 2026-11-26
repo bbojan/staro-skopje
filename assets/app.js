@@ -3,19 +3,46 @@
   'use strict';
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   // the few strings the script writes itself (the pages are translated at build time by tools/i18n_en.py)
-  const STR = {
-    mk: ['Музика во позадина: вклучена', 'Музика во позадина: исклучена'],
-    en: ['Background music: on', 'Background music: off'],
-    sq: ['Muzika në sfond: e ndezur', 'Muzika në sfond: e fikur'],
-    tr: ['Arka plan müziği: açık', 'Arka plan müziği: kapalı'],
-    de: ['Hintergrundmusik: an', 'Hintergrundmusik: aus'],
-    el: ['Μουσική υπόκρουση: ενεργή', 'Μουσική υπόκρουση: ανενεργή'],
-    sr: ['Музика у позадини: укључена', 'Музика у позадини: искључена'],
-    hr: ['Glazba u pozadini: uključena', 'Glazba u pozadini: isključena'],
-  }[document.documentElement.lang] || ['Музика во позадина: вклучена', 'Музика во позадина: исклучена'];
-  const T = { musicOn: STR[0], musicOff: STR[1] };
+  const STR = {   // music on, music off, show map, hide map
+    mk: ['Музика во позадина: вклучена', 'Музика во позадина: исклучена', 'Прикажи ја ориентационата мапа', 'Скриј ја ориентационата мапа'],
+    en: ['Background music: on', 'Background music: off', 'Show the orientation map', 'Hide the orientation map'],
+    sq: ['Muzika në sfond: e ndezur', 'Muzika në sfond: e fikur', 'Shfaq hartën orientuese', 'Fshih hartën orientuese'],
+    tr: ['Arka plan müziği: açık', 'Arka plan müziği: kapalı', 'Yönlendirme haritasını göster', 'Yönlendirme haritasını gizle'],
+    sr: ['Музика у позадини: укључена', 'Музика у позадини: искључена', 'Прикажи оријентациону мапу', 'Сакриј оријентациону мапу'],
+    hr: ['Glazba u pozadini: uključena', 'Glazba u pozadini: isključena', 'Prikaži orijentacijsku kartu', 'Sakrij orijentacijsku kartu'],
+    de: ['Hintergrundmusik: an', 'Hintergrundmusik: aus', 'Orientierungskarte anzeigen', 'Orientierungskarte ausblenden'],
+    el: ['Μουσική υπόκρουση: ενεργή', 'Μουσική υπόκρουση: ανενεργή', 'Εμφάνιση χάρτη προσανατολισμού', 'Απόκρυψη χάρτη προσανατολισμού'],
+    bg: ['Фонова музика: включена', 'Фонова музика: изключена', 'Покажи ориентировъчната карта', 'Скрий ориентировъчната карта'],
+    sl: ['Glasba v ozadju: vklopljena', 'Glasba v ozadju: izklopljena', 'Pokaži orientacijski zemljevid', 'Skrij orientacijski zemljevid'],
+    fr: ['Musique de fond : activée', 'Musique de fond : désactivée', "Afficher la carte d'orientation", "Masquer la carte d'orientation"],
+    es: ['Música de fondo: activada', 'Música de fondo: desactivada', 'Mostrar el mapa de orientación', 'Ocultar el mapa de orientación'],
+    ru: ['Фоновая музыка: включена', 'Фоновая музыка: выключена', 'Показать ориентировочную карту', 'Скрыть ориентировочную карту'],
+  };
+  const LANG = STR[document.documentElement.lang] || STR.mk;
+  const T = { musicOn: LANG[0], musicOff: LANG[1], mapShow: LANG[2], mapHide: LANG[3] };
   // close the language menu when clicking elsewhere
   document.addEventListener('click', e => { const m = $('details.langs[open]'); if (m && !m.contains(e.target)) m.open = false; });
+
+  // ---------------------------------------------------------------- topic orientation map
+  // one CD marker per photo; ‹ › step through them, a postcard's link selects its own, and the lightbox
+  // shows the same map in its corner with the marker of the photo on screen
+  const loc = document.getElementById('loc');
+  let markPhoto = () => false;        // markPhoto(n): show photo n's marker (postcard number); true if it has one
+  if (loc) {
+    const marks = [...loc.querySelectorAll('.mk')], n = loc.querySelector('.loc-n');
+    const total = n ? n.textContent.split('/')[1].trim() : '';
+    let cur = 0;
+    const show = k => {
+      cur = (k + marks.length) % marks.length;
+      marks.forEach((m, j) => { m.hidden = j !== cur; });
+      if (n) { const i = marks[cur].dataset.i; n.textContent = `${i} / ${total}`; n.href = `#r${i}`; }
+    };
+    markPhoto = i => { const j = marks.findIndex(m => m.dataset.i === String(i)); if (j >= 0) show(j); return j >= 0; };
+    const prev = loc.querySelector('.loc-prev'), next = loc.querySelector('.loc-next');
+    prev && prev.addEventListener('click', () => show(cur - 1));
+    next && next.addEventListener('click', () => show(cur + 1));
+    $$('.pc-loc').forEach(a => a.addEventListener('click', () => markPhoto(a.dataset.mk)));
+  }
 
   // ---------------------------------------------------------------- lightbox for every a.zoom on the page
   const lb = $('dialog.lightbox');
@@ -23,6 +50,38 @@
   for (const a of allZooms) if (!zooms.some(z => z.href === a.href)) zooms.push(a);   // postcard + album = one photo
   if (lb && zooms.length) {
     const img = $('img', lb), cap = $('figcaption', lb), count = $('.lb-count', lb);
+    // topic pages: a copy of the orientation map, kept in step with the photo on screen
+    const lbMap = loc ? loc.querySelector('.locator-map').cloneNode(true) : null;
+    if (lbMap) {
+      lbMap.className = 'lb-map';
+      lbMap.querySelector(':scope > img').loading = 'eager';
+      lb.append(lbMap);
+    }
+    // the corner map can be hidden: a map button next to ✕, or a tap on the map; remembered across pages
+    const mapBtn = lbMap ? document.createElement('button') : null;
+    let mapOn = true;
+    try { mapOn = localStorage.getItem('lbmap') !== 'off'; } catch (e) { }
+    const setMap = on => {
+      mapOn = on;
+      try { localStorage.setItem('lbmap', on ? 'on' : 'off'); } catch (e) { }
+      lb.classList.toggle('map-off', !on);
+      mapBtn.setAttribute('aria-pressed', String(on));
+      mapBtn.title = mapBtn.ariaLabel = on ? T.mapHide : T.mapShow;
+    };
+    if (mapBtn) {
+      mapBtn.type = 'button'; mapBtn.className = 'lb-maptoggle';
+      mapBtn.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" '
+        + 'stroke-width="2" stroke-linejoin="round"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg>';
+      lb.append(mapBtn);
+      mapBtn.addEventListener('click', () => setMap(!mapOn));
+      lbMap.addEventListener('click', () => setMap(false));
+      setMap(mapOn);
+    }
+    const photoNo = a => {                                  // postcard number of a zoom link (postcard or album thumb)
+      const f = a.closest('figure.postcard');
+      if (f) return +f.id.slice(1);
+      return +(a.title || '').split('/')[0].trim() || 0;
+    };
     let i = 0;
     const show = k => {
       i = (k + zooms.length) % zooms.length;
@@ -30,7 +89,16 @@
       img.src = a.href; img.alt = $('img', a)?.alt || '';
       const fc = fig && (fig.querySelector('figcaption') || fig.querySelector('h3'));
       cap.innerHTML = fc ? fc.innerHTML : '';
+      $$('.pc-loc', cap).forEach(x => x.replaceWith(''));   // the corner map already shows it
       count.textContent = zooms.length > 1 ? `${i + 1} / ${zooms.length}` : '';
+      if (lbMap) {
+        const no = photoNo(a);
+        const mks = [...lbMap.querySelectorAll('.mk')], on = mks.find(m => m.dataset.i === String(no));
+        mks.forEach(m => { m.hidden = m !== on; });
+        lbMap.hidden = !on;
+        mapBtn.hidden = !on;                               // nothing to toggle for a photo without a marker
+        if (on) markPhoto(no);                             // the page's own map follows too
+      }
       // preload neighbours
       [i - 1, i + 1].forEach(n => { const z = zooms[(n + zooms.length) % zooms.length]; if (z) new Image().src = z.href; });
     };
@@ -163,26 +231,6 @@
       wanted = !wanted; localStorage.setItem('bgm', wanted ? 'on' : 'off'); setUi();
       if (wanted) startBgm(); else bgm.pause();
     });
-  }
-
-  // topic orientation map: one CD marker per photo; ‹ › step through them, a postcard's link selects its own
-  const loc = document.getElementById('loc');
-  if (loc) {
-    const marks = [...loc.querySelectorAll('.mk')], n = loc.querySelector('.loc-n');
-    const total = n ? n.textContent.split('/')[1].trim() : '';
-    let cur = 0;
-    const show = k => {
-      cur = (k + marks.length) % marks.length;
-      marks.forEach((m, j) => { m.hidden = j !== cur; });
-      if (n) { const i = marks[cur].dataset.i; n.textContent = `${i} / ${total}`; n.href = `#r${i}`; }
-    };
-    const prev = loc.querySelector('.loc-prev'), next = loc.querySelector('.loc-next');
-    prev && prev.addEventListener('click', () => show(cur - 1));
-    next && next.addEventListener('click', () => show(cur + 1));
-    document.querySelectorAll('.pc-loc').forEach(a => a.addEventListener('click', () => {
-      const j = marks.findIndex(m => m.dataset.i === a.dataset.mk);
-      if (j >= 0) show(j);
-    }));
   }
 
   // only one narration/film at a time; the background music steps aside while one plays
