@@ -165,6 +165,26 @@
     });
   }
 
+  // topic orientation map: one CD marker per photo; ‹ › step through them, a postcard's link selects its own
+  const loc = document.getElementById('loc');
+  if (loc) {
+    const marks = [...loc.querySelectorAll('.mk')], n = loc.querySelector('.loc-n');
+    const total = n ? n.textContent.split('/')[1].trim() : '';
+    let cur = 0;
+    const show = k => {
+      cur = (k + marks.length) % marks.length;
+      marks.forEach((m, j) => { m.hidden = j !== cur; });
+      if (n) { const i = marks[cur].dataset.i; n.textContent = `${i} / ${total}`; n.href = `#r${i}`; }
+    };
+    const prev = loc.querySelector('.loc-prev'), next = loc.querySelector('.loc-next');
+    prev && prev.addEventListener('click', () => show(cur - 1));
+    next && next.addEventListener('click', () => show(cur + 1));
+    document.querySelectorAll('.pc-loc').forEach(a => a.addEventListener('click', () => {
+      const j = marks.findIndex(m => m.dataset.i === a.dataset.mk);
+      if (j >= 0) show(j);
+    }));
+  }
+
   // only one narration/film at a time; the background music steps aside while one plays
   document.addEventListener('play', e => {
     if (e.target === bgm) { if (busy()) bgm.pause(); return; }

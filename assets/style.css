@@ -135,7 +135,23 @@ h1 { font-size: clamp(2rem, 5vw, 3.4rem); margin: 0 0 .3em; }
 .side-box h2 { font-size: 18px; margin: 4px 4px 10px; }
 .locator figcaption { font-size: 14px; color: var(--ink-2); padding: 8px 4px 0; }
 .locator-map { position: relative; border-radius: 6px; overflow: hidden; }
-.locator-map img { width: 100%; height: 100%; object-fit: fill; }
+.locator-map > img { width: 100%; height: 100%; object-fit: fill; }
+/* the CD's own map markers: red arrows (or an ellipse) showing where a photo was taken and the camera's direction,
+   bouncing inside their box like the CD's AnimationController */
+.mk { position: absolute; pointer-events: none; }
+.mk[hidden] { display: none; }
+.mk img { position: absolute; left: var(--x0); top: var(--y0); width: var(--w); height: var(--h); max-width: none;
+  filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 2px #fff8); }
+@keyframes mkx { from { left: 0; } to { left: calc(100% - var(--w)); } }
+@keyframes mky { from { top: 0; } to { top: calc(100% - var(--h)); } }
+@media (prefers-reduced-motion: reduce) { .mk img { animation: none !important; } }
+.locator figcaption { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.loc-nav { display: inline-flex; align-items: center; gap: 6px; }
+.loc-nav button { border: 0; background: var(--paper-2); color: var(--ink); width: 32px; height: 32px; border-radius: 50%;
+  font-size: 20px; line-height: 1; cursor: pointer; }
+.loc-nav button:hover { background: var(--accent); color: var(--accent-ink); }
+.loc-n { min-width: 4.5em; text-align: center; color: var(--ink-2); text-decoration: none; font-variant-numeric: tabular-nums; }
+.pc-loc { margin-left: 10px; font-size: 13px; }
 .pin { position: absolute; transform: translate(-50%, -50%); border: 3px solid #e23b22; border-radius: 50%;
   box-shadow: 0 0 0 3px #fff8; animation: pulse 1.6s ease-in-out infinite; }
 @keyframes pulse { 50% { transform: translate(-50%, -50%) scale(1.25); opacity: .65; } }
